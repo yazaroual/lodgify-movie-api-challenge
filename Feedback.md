@@ -14,14 +14,11 @@ I Started by the Readme and gathered the requirements. I noticed a few things :
 
 Running `docker-compose up` allowed me to reach Swagger for the `Movies API`, an authentication key is requeried. It will be added to the configuration file.
 
-Continuing my exploration, I looked at the docker-compose.yaml file to better understand what was made available for this environment. It pulls the `lodgify/movies-api:3`, checking on dockerhub I noticed that an update was available [lodgify/movies-api:4](https://hub.docker.com/layers/lodgify/movies-api/4/images/sha256-857bcefb757c46cf65b6b00bf5e0db51cc7d0f055f48bf6c8a7c08f6a461f263), it was not required to updated the movie api but that could be a nice upgrade for later. The main difference seems to be the .NET version that goes from 6 to 8. The new image also provides better sample data.
-
+Continuing my exploration, I looked at the docker-compose.yaml file to better understand what was made available for this environment. It pulls the `lodgify/movies-api:3`, checking on dockerhub I noticed that an update was available [lodgify/movies-api:4](https://hub.docker.com/layers/lodgify/movies-api/4/images/sha256-857bcefb757c46cf65b6b00bf5e0db51cc7d0f055f48bf6c8a7c08f6a461f263), it was not required to updated the `Movies API` but that could be a nice upgrade for later. The main difference seems to be the .NET version that goes from 6 to 8. The new image also provides better sample data.
 
 Openning the csproj shows that the `Cinema API` is already configured as a gRPC client. It's in .NET 3.1 and includes a `Controllers\` folder that cannot be found in the project directory. This will need to be created. A gRPC package is available `Grpc.AspNetCore` but I am wondering if it's not missing a Client specific package. To be tested. Disclaimer : I never had the chance to work with gRPC, this is the time then !
 
-
 Program.cs confirms that the Console logging is configured.
-
 
 Startup.cs confirms that the Database is configured and Controllers are declared. I just need to create them. There is no authentication configuration.
 
@@ -36,22 +33,22 @@ From there my plan is to :
 6. Use caching, this could be seen as an early optimization but as the `Movies API` is slow and fails more times than it works, this becomes a necessity to make our API usable and reduce our users frustration.
 7. Implement seats reservations
 8. Implement seats confirmations
-9. Add execution time tracking, this is hepfull for long terme observability and optimization, so it's not a priority.
+9. Add execution time tracking, this is hepful for long term observability and optimization, so it's not a priority.
 10. Fix the `Movies API` configuration if anything is wrong there.
 
 After creating the unit test, controller stub for showtimes and configured swagger, it was time to move to using the gRPC call to get the movies list.
 
-Fixing the gRPC call required to use the Api Key found in the `Movies API` swagger. I added the key to the configuration file and injected the configuration to the `ApiClientGrpc` service. While doing so, I moved the proto file to it's `Protos` directory and the grpc client to a `Services` directory, for clarity. Now it's show time !
+Fixing the gRPC call required to use the Api Key found in the `Movies API` swagger. I added the key to the configuration file and injected the configuration to the `ApiClientGrpc` service. While doing so, I moved the proto file to it's `Protos` directory and the gRPC client to a `Services` directory, for clarity. Now it's show time !
 
-Thinking about the screen to create shows, I figured we would have a form where we can select a movie, an auditorium and a date. A price would have been nice but I noticed it was not requested by the data layer. I also thought that we wouldn't like to expose the grpc layer to the controller, because later we would add caching. To do so I created DTOs and updated the grpc client to return a `List<MovieDTO>` instead of grpc objects.
+Thinking about the screen to create shows, I figured we would have a form where we can select a movie, an auditorium and a date. A price would have been nice but I noticed it was not requested by the data layer. This is something I would have discussed with the PO to make sure we do not miss something, and if confirmed I would have added it to the data layer. I also thought that we wouldn't like to expose the gRPC layer to the controller, because later we would add caching. To do so I created DTOs and updated the gRPC client to return a `List<MovieDTO>` instead of gRPC objects.
 
-A strange disparity I noticed between `MovieEntity` and the `showResponse` is that the first is expecting an ImdbId and an int for it's primary id, while the last only sends back a string id. This could be clarified by checking the API documentation or asking the dev team for more informations but for this exercice I will assume the Id returned by the `Movies API` is the imdbId and that the int id related to the `MovieEntity` is the unique id of this entity when associated with a show. ie, we could have a single movie associated with multiple show times and they will have as many unique ids.
+A strange disparity I noticed between `MovieEntity` and the `showResponse` is that the first is expecting an ImdbId and an int for it's primary id, while the last only sends back a string id. This could be clarified by checking the API documentation or asking the dev team for more information. For this exercice I will assume the id returned by the `Movies API` is the imdbId and that the int id related to the `MovieEntity` is the unique id of this entity when associated with a show. ie, we could have a single movie associated with multiple show times and they will have as many unique ids.
 
 Creating a show time works ! 
 
 At this stage the time is running out, I have already spent a little more than the 3 hours that where required for this test. As I understand that this project aim is to open a design discussion I will stop here but explain what I would have added in what's left to do.
 
-For the caching I would have added it to the grpc service using the following logic
+For the caching I would have added it to the gRPC service using the following logic
 ```
 Call the API
 Did it fail ? This could be determined by a catch or by checking the server response
@@ -78,17 +75,17 @@ For the point about `Fixing the Movies API`, I can see that we may need to :
 
 One last thing, as I get from reading the instruction that we want to focus on performance, we may also want to update the .NET version to .NET 8 to also improve the performance.
 
-Thanks for reading me so far, I hope we will be able to discuss all of this live ! 
+Thanks for reading me so far, I hope we will be able to discuss all of this together ! 
 
 
-## Requirments 
+## Requirements 
 
 This list is priorized.
 
 
 - [x] Add unit tests project to have a TDD approach
 - [x] Configure Swagger 
-- [x] Authentication - Protected the `Cinema API` with an API Key, for the need of this exercice it will be static.
+- [x] Authentication - Protect the `Cinema API` with an API Key, for the need of this exercice it will be static.
 - [x] Movies API - Configure the API Key
 - [x] Movies API - gRPC needs to be fixed, for faster communication
 - [x] Showtimes - Create showtimes by using the `Movies API`
@@ -100,7 +97,6 @@ This list is priorized.
 - [ ] Buy seats - Request should contain : Reservation GUID
 - [ ] Buy seats - It is not possible to buy the same seat two times
 - [ ] Buy seats - Expired reservation GUIDs are not accepted
-
 - [ ] Execution Tracking - track the execution time of each request
 - [ ] Add requests to cUrls file
 - [ ] Fix `Movies API` configuration
