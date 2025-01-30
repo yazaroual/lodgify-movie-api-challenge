@@ -26,9 +26,12 @@ namespace ApiApplication
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<ApiClientGrpcSettings>(Configuration.GetSection("ApiClientGrpcSettings"));
+
             services.AddTransient<IShowtimesRepository, ShowtimesRepository>();
             services.AddTransient<ITicketsRepository, TicketsRepository>();
             services.AddTransient<IAuditoriumsRepository, AuditoriumsRepository>();
+            services.AddTransient<IApiClientGrpc, ApiClientGrpc>();
 
             services.AddDbContext<CinemaContext>(options =>
             {

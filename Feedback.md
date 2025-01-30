@@ -41,6 +41,12 @@ From there my plan is to :
 
 After creating the unit test, controller stub for showtimes and configured swagger, it was time to move to using the gRPC call to get the movies list.
 
+Fixing the gRPC call required to use the Api Key found in the `Movies API` swagger. I added the key to the configuration file and injected the configuration to the `ApiClientGrpc` service. While doing so, I moved the proto file to it's `Protos` directory and the grpc client to a `Services` directory, for clarity. Now we can move to working with shows !
+
+Thinking about the screen to create shows, I figured we would have a form where we can select a movie, an auditorium and a date. A price would have been nice but I noticed it was not requested by the data layer. I also thought that we wouldn't like to expose the grpc layer to the controller, because later we would add caching, to do so I created DTOs and updated the grpc client to return a `List<MovieDTO>` instead of grpc objects.
+
+A strange disparity I noticed between `MovieEntity`and the `showResponse` is that the first is expecting an ImdbId and an int for it's primary id, while the last only sends back a string id. This could be clarified by checking the API documentation or asking the dev team for mor information but for this exercice I will assume the Id returned by the `Movies API` is the imdbId and that the int id related to the `MovieEntity` is the unique id of this entity when associated with a show. ie, we could have a single movie associated with multiple show times and they will have as many unique ids.
+
 ## Requirments 
 
 This list is priorized.
@@ -48,10 +54,10 @@ This list is priorized.
 
 - [x] Add unit tests project to have a TDD approach
 - [x] Configure Swagger 
+- [x] Authentication - Protected the `Cinema API` with an API Key, for the need of this exercice it will be static.
 - [x] Movies API - Configure the API Key
-- [ ] Movies API - gRPC needs to be fixed, for faster communication
-- [ ] Authentication - Protected the `Cinema API` with an API Key, for the need of this exercice it will be static.
-- [ ] Showtimes - Create showtimes by using the `Movies API`
+- [x] Movies API - gRPC needs to be fixed, for faster communication
+- [x] Showtimes - Create showtimes by using the `Movies API`
 - [ ] Cache - Use caching to improve reliability, ProvidedAPI is slow and fails a lot.
 - [ ] Reserve seats - Reponse should contain : GUID, Nb of seat, Auditorium name, Movie Name
 - [ ] Reserve seats - Reservation should expire after 10 min
