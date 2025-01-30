@@ -1,2 +1,7 @@
 Please add the cURLs of your tests here:
-
+# Get available movies to show populate the Create Show Time screen 
+curl -X GET "https://localhost:7629/showtimes/movies" -H  "accept: */*" -H  "X-Api-Key: 1234abcd"
+# Get available auditoriums
+curl -X GET "https://localhost:7629/showtimes/auditoriums" -H  "accept: */*" -H  "X-Api-Key: 1234abcd"
+# Create a showtime
+curl -X POST "https://localhost:7629/showtimes" -H  "accept: */*" -H  "X-Api-Key: 1234abcd" -H  "Content-Type: application/json" -d "{\"sessionDate\":\"2025-01-30T15:15:37.784Z\",\"movieId\":\"ID-test1\",\"auditoriumId\":1}"
