@@ -1,2 +1,3 @@
 Please add the cURLs of your tests here:
-
+# Get available movies to show populate the Create Show Time screen 
+curl -X GET "https://localhost:7629/showtimes/movies" -H  "accept: */*" -H  "X-Api-Key: 1234abcd"

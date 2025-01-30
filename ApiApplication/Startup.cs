@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using ApiApplication.Database;
 using ApiApplication.Database.Repositories;
 using ApiApplication.Database.Repositories.Abstractions;
+using ApiApplication.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -40,7 +42,31 @@ namespace ApiApplication
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Cinema API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Cinema API", Version = "v1", Description = "This is a Cinema management API. All requests should be authenticated by the following API Key : `1234abcd` set in the `X-Api-Key` header." });
+
+                // Configure an API key for the Swagger UI
+                c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+                {
+                    Description = "ApiKey must appear in header",
+                    Type = SecuritySchemeType.ApiKey,
+                    Name = "X-Api-Key",
+                    In = ParameterLocation.Header,
+                    Scheme = "ApiKeyScheme"
+                });
+                var key = new OpenApiSecurityScheme()
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "ApiKey"
+                    },
+                    In = ParameterLocation.Header
+                };
+                var requirement = new OpenApiSecurityRequirement
+                                {
+                                        { key, new List<string>() }
+                                };
+                c.AddSecurityRequirement(requirement);
             });
         }
 
@@ -65,6 +91,8 @@ namespace ApiApplication
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Cinema API");
                 c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
             });
+
+            app.UseMiddleware<ApiKeyMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {

@@ -39,6 +39,8 @@ From there my plan is to :
 9. Add execution time tracking, this is hepfull for long terme observability and optimization, so it's not a priority.
 10. Fix the `Movies API` configuration if anything is wrong there.
 
+After creating the unit test, controller stub for showtimes and configured swagger, it was time to move to using the gRPC call to get the movies list.
+
 ## Requirments 
 
 This list is priorized.
@@ -46,7 +48,7 @@ This list is priorized.
 
 - [x] Add unit tests project to have a TDD approach
 - [x] Configure Swagger 
-- [ ] Movies API - Configure the API Key
+- [x] Movies API - Configure the API Key
 - [ ] Movies API - gRPC needs to be fixed, for faster communication
 - [ ] Authentication - Protected the `Cinema API` with an API Key, for the need of this exercice it will be static.
 - [ ] Showtimes - Create showtimes by using the `Movies API`
